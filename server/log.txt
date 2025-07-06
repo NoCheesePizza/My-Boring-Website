@@ -1,15 +1,25 @@
+Meat
+Dairy
+Hot things
+Cold things
 Indie videogames or developers
+Stores in Singapore that sell food or drinks
 Singapore train stations
 Tourist attractions
 Colours
 Fruits
 Sea creatures
 Occupations
-Chemistry terms
+Spicy, peppery, or minty things
+Things you can find in this room
 Math terms
 Trees
 Countries
 Cities or states
+Things you can find in Popular
+Japanese or Korean cuisine
+Foreign loan words
+Colourful objects
 Ways to chao keng
 Videogame terms
 Mobile apps
@@ -17,70 +27,114 @@ Buttons you can find in the settings menu
 YouTube channels with more than 1000 subs
 Movie titles
 Anime or cartoon titles
+Things you can see through
+Green things
+Black things
 Dumb ways to die
 Weapons
+Things in a fantasy world
+Things in a futuristic world
 Hobbies
 Musical instruments
 School subjects
+Languages, language families, creoles, or dialects
 Celestial objects
+Fast things
 Unhealthy things or actions
+Things you can find in a hospital
+Words to describe food
 Words to describe a person's appearance
+Things that contain numbers
 Stationery
+Red things
+Things you can find at a beach
+Restaurants or eateries with seats
 Things to do at a party
-Things you wear above your waist
+Things you wear on or above your waist
 Human or natural disasters
 Excuses for being late
 Words related to money
+Cooking terms
 Reasons to get scolded by the teacher
+Drinks
 Units of Measurement
 Animal defence methods
 Song titles
+Pastries
 Controversial topics
 Non-tech acronyms (state full name)
 Insults
 Body parts
 Bodies of water
 Senses
+Things you can find at a theme or water park
+Anything related to frontend development or UI/UX
+Things that move quickly
+Things that have a shell
 Cosmetics or toiletries
 Ways of communication
 Things you can do or make in Excel
+Expensive things
 Famous Singaporeans
 Allergies
 Bad habits
 Things that piss people off
 Invertebrates
 Words related to cells
+Things you can find in a police station
 Medicine or other beneficial chemicals
+Things that you can turn on
+Things that can turn you on
 Sports
+Things that can change size
+Singlish words
+Disgusting things
 Carbohydrates
+Western cuisine
 Things you bring to school
+Things smaller than your fist
 Morning routine
 Villains or bosses
+Intangible things
+Things with a long range
 Things that take less than five minutes
 Anything to do with cars
 Reasons to not submit your homework
 Famous people who are no longer alive
+Words or phrases with a colour word
 Places to stay the night at
+Orange or yellow things
+Things that you fold
 Book or movie genres
+Desserts
+Anything to do with ice-cream
 Crimes
+Things that come in pairs or sets
 Superpowers
 A common English boy's name
 A common English girl's name
-Mythical creatures or urban legends
+Fantastical creatures or urban legends
+Things in Minecraft
 Vegetables
 Stones, minerals, or gems
 Videogame buffs or debuffs
 Things people lie about
 Singapore shopping malls
+Painful things
 Materials
 Ways to punish or torture someone
+Things that can fly
+Things that can be opened
+Breakfast food
 Anything to do with CNY
+Things that can change colour
 Non-digital games
 Military technology
 Metrics to rank a city by
 Reasons to run
 Things that emit light
 Fonts
+Things people are afraid of
 Periods of time
 CCAs
 Buttons you can find in a photo editor
@@ -92,89 +146,159 @@ Geography terms (no specific place names)
 (Pre)Historic events
 Types of buildings
 Obsessive behaviour
+Things that jump
 Things people use to decorate their houses
+Things you get tickets for
 Mammals
-Sports equipment
+Things with scales
+Sauces
+Things with more than two legs
+Underground things
+Sports equipment or attire
 Proverbs, idioms, or famous quotes
-Anything related to religion
+Anything related to mythology or religion that isn’t Christianity
+Things you can find at a campsite
+Rare things
 Ways of generating electricity
-Reasons to lockdown
+Reasons to lock down
+Compound words (no spaces)
+Things on a tze char menu
 Reasons to shift houses
 Playable videogame characters
 Game genres
+Things you don't want in your house
+Things that have buttons
+Fermented food
 Electronics
+Bread spreads or fillings
 Festivals or holidays
+Brown things
 Singapore schools
 Anime or cartoon characters
 Places you need clearance for
+Words with four syllables
+Things with pockets
+Words with at least four different vowels
 Things you can find a QR code on
 Reasons to get fined
 Fictional places
 Words related to arts and craft
 Reasons to dial 995 (and not 999)
 Reasons to dial 999 (and not 995)
+Non-living things that grow
+Slow things
 Disorders or diseases
+Spherical objects
+Sharp objects
+Things people farm
+Things that are made of rubber
+Things that are made of metal
+Things that can be described as soft
 Plant parts
+Non-food items in a kitchen
+Anything to do with chocolate
+Things you can make on your own
+Things with bugs
 Things named after famous people
 Possible dares from Truth or Dare
-Pseudoscience
 Body modifications
 Signs of growing up or aging
 Deadly animals
+Things that can be opened or closed
 Reptiles or amphibians
+Things in your house that can contain liquid
 Undrinkable liquids
 Technology companies
 Internal organs or tissues
 Gases
 Types of relationships
+Sensitive things
+Words with two or more meanings
 Virtues or sins
 Animal habitats
+Sour things
 Phone or computer hardware
+Long things
+Things that camouflage
+Things that spin
 Things to do on a date
 Music theory
 Microphone or camera jargon
 Words to describe hair
+Non-Singlish slang
+Sticky things
 Things or actions that prevent infections
+Things with locks
 Cute things or actions
 Non-game software
+Things you traverse in or on
 Freshwater organisms
 Ranks, titles, or positions
 Common phrases
 Metrics to rank a phone by
+Common programming keywords or functions
 Ways to screw up in NS
+Things that slither
 Differences between males and females
 Places in Europe or the Middle East
 Places in Asia or the Middle East
 Things or actions that hurt the environment
 Bands, singers, or songwriters
-Things you wear on or below your waist
+Things you wear below your waist or across both halves of your body
 Anything to do with cards
 Physics terms
 Metrics to rank a job by
-Words to describe winter
 Stores that sell things you wear
+Things that can be described as corrupted
 Reasons to choose one school over another
+Anything related to Japan
+Anything related to Singapore
 Pokémons
 Emotions or feelings
-Sports attire
 Competitions
+Anything related to China
 Technology developed after 1900
+Anything to do with eggs
 Books
+Anything related to India
+Anything related to Europe
 Things to do with your friends
 Reasons to choose someone as your SO
 Uniquely human traits
 Relationship red flags
 Household chores
+Sweet things
+Anything to do with sushi
 Islands or archipelagoes
-Anything to do with NS
+Things with magnets
+Programming languages, libraries, or frameworks
+Healthy food
+Data structures or algorithms
+Food you can eat raw
+Dishes with noodles or pasta
+Buttons in a text or code editor
+File extensions
 Anything related to cloud computing
 Anything related to game engines
-Things you and a banana have in common
+Things associated with luck
+Things you and a snail have in common
+Things with wheels
 Bugs
+Words ending in "logy"
+Words ending in "ism"
+Root words containing "ph" or "gh"
+Onomatopeoia
+Irregular verbs
+Words with different US & UK spellings
+Words or phrases with a number
+White things
+Finger food
+Things that break easily
 Non-food items that expire
 Tech acronyms (state full name)
 Things below $10 but above $0
 Anything related to AI
+Rectangular objects
 Anything related to the weather or the sky
 Multiplayer games
 Single-player games
@@ -182,14 +306,30 @@ Anything related to Boomerang Fu or PlateUp!
 Number types or constants
 Memes or anything viral
 Clothing
+Blue things
+Words ending in "ge"
+Food that crunch
+Dishes served with chopsticks
+Seafood
+Open source software
 Things to claim to get 1-2 days MC
 Overpriced things
+Scary things
 Loud or annoying sounds
-Symbols used in math, science or coding
+Things you can find at an airport
+Free things
+Items sold in a McDonald's
+Words with 3 or more of the same letter
+Shell commands
+Symbols used in math, science, or programming
+Words ending in "ment"
+Words ending in "al"
 Anything to do with digital art
-Writing tools
+Writing or drawing tools
 Words to describe size or scale
+6 or more letter words with 1 vowel
 Regions in Singapore
+Words that start and end with the same letter
 Triple A videogames or studios
 Anything to do with operating systems
 Start of song verses (in any language)
@@ -206,6 +346,8 @@ Places in Africa or the Middle East
 Anything to do with psychology
 Famous people who are still alive
 Reasons to drop out of school
+Things that are made of wood
+Anything related to the USA
 Anything to do with guns
 Books, games, or movies with sequels
 Book, game, or movie producer/publisher
@@ -219,253 +361,18 @@ Reasons to rate a hotel 1 star
 Reasons to rate an airline 1 star
 Reasons to write a Google review
 Institutes of higher education
+Herbs, spices, or salad greens
 Fishes
 Metrics to rank a story or show by
 Arthropods
 Vertebrates
+Things you can find in an airplane
+Things you can find in a place of worship
 Things related to Apple or their products
 Things related to Microsoft or their products
 Things related to Google or their products
 Metrics to rank a game by
 Finance companies
-Transport companies
-Jobs that were very different or didn't exist 300 years ago
-Things that smell bad
-Things you can find in a science lab (no chemical names)
-Examples of inequality or discrimination
-World events since 2000
-Anything in Singapore’s headlines since 2000
-Obsolete technology
-Biological chemicals
-Specialisations in biology or medicine
-Specialisations in chemistry, engineering, or physics
-Items you can craft in videogames
-Ways to heal in videogames
-Ways to stay healthy
-Natural places that are not countries, cities, or states
-Things you don't want in your pocket
-Things that smell nice
-Things that bounce
-Reasons people cry
-Things you can't say on national TV
-Ways to make money
-Poisonous or venomous things
-Things in your backpack that might get confiscated by airport security
-Books, games, or movies without sequels
-Things that can be seen only under an optical microscope
-Non-living things that were once alive
-Videogame skins
-Social etiquette
-Reasons to take someone's life
-Anything to do with gymming
-Anything to do with humans swimming
-Pet peeves
-Reasons to celebrate
-Things you can only use once
-Things that can burst or explode
-Singapore or Singaporean traits
-Things you can't live without
-Anything related to networking
-Videogame NPCs
-Qualities that make or break an employee
-Anything to do with fungi
-Things in PvZ
-Things associated with being poor
-Buttons you can find in a video editor
-Inconsiderate things or actions that aren't illegal
-Economics terms
-Anything related to the Singapore government
-Authority figures
-Things that can be described as vanilla or vanilla-flavoured
-Things that can be charged
-Things people hide
-Default keyboard shortcuts (any order, state what they do)
-Reasons to skip class
-Things you can find in an Indian restaurant
-Things you can find at the bank
-Things you can find in a hotel room
-Things you can find at a construction site
-Things you can find in a bar or club
-Things you can find on the first floor of a HDB flat
-Things you can find in a train station
-Things that roll
-Anything related to blood
-Anything related to the digestive system
-Ways to make a new friend
-Ways to lose a friend
-Relationship green flags
-Things people queue for
-Things that can be easily lost
-Battle passes or subscription services
-Anything related to the nervous or endocrine system
-Reasons to keep quiet
-Singapore's critical infrastructure
-Food sold in supermarkets with a shelf life of a month or more
-Items sold in a pharmacy
-Anything to do with dermatology
-Buttons you can find in a chat or social media app
-Common pets or their breeds
-Meat
-Dairy
-Stores in Singapore that sell food or drinks
-Spicy, peppery, or minty things
-Japanese or Korean cuisine
-Words to describe food
-Restaurants or eateries with seats
-Cooking terms
-Drinks
-Pastries
-Western cuisine
-Desserts
-Anything to do with ice-cream
-Breakfast food
-Sauces
-Things on a tze char menu
-Fermented food
-Bread spreads or fillings
-Anything to do with chocolate
-Sour things
-Anything to do with eggs
-Sweet things
-Anything to do with sushi
-Healthy food
-Food you can eat raw
-Dishes with noodles or pasta
-Finger food
-Food that crunch
-Dishes served with chopsticks
-Seafood
-Items sold in a McDonald's
-Herbs, spices, or salad greens
-Dishes with rice
-Dessert or drink toppings
-Anything to do with butter
-Anything to do with cheese
-Street food
-Anything related to milk
-Anything related to chicken
-Anything related to beef
-Anything related to (bubble) tea
-Southeast Asian cuisine
-Anything related to coffee
-Anything related to alcohol
-Common ingredients used in Chinese cuisine
-Salty things
-Anything related to oil
-Hot things
-Cold things
-Colourful objects
-Things you can see through
-Green things
-Black things
-Fast things
-Things that contain numbers
-Red things
-Things that move quickly
-Things that have a shell
-Expensive things
-Things that you can turn on
-Things that can turn you on
-Things that can change size
-Disgusting things
-Things smaller than your fist
-Intangible things
-Things with a long range
-Orange or yellow things
-Things that you fold
-Things that come in pairs or sets
-Things you walk on
-Painful things
-Things that can fly
-Things that can be opened
-Things that can change colour
-Things people are afraid of
-Things that jump
-Things you get tickets for
-Things with scales
-Things with more than two legs
-Underground things
-Rare things
-Things that have buttons
-Brown things
-Things with pockets
-Non-living things that grow
-Slow things
-Spherical objects
-Sharp objects
-Things people farm
-Things that are made of rubber
-Things that are made of metal
-Things that can be described as soft
-Things you can make on your own
-Things with bugs
-Things that can be opened or closed
-Sensitive things
-Long things
-Things that camouflage
-Things that spin
-Sticky things
-Things with locks
-Things you traverse in or on
-Things that slither
-Things that can be described as corrupted
-Things with magnets
-Things associated with luck
-Things with wheels
-White things
-Things that break easily
-Rectangular objects
-Blue things
-Scary things
-Free things
-Things that are made of wood
-Things you can find in this room
-Things you can find in Popular
-Things in a fantasy world
-Things in a futuristic world
-Things you can find in a hospital
-Things you can find at a beach
-Things you can find at a theme or water park
-Things you can find in a police station
-Things in Minecraft
-Things you can find at a campsite
-Things you don't want in your house
-Non-food items in a kitchen
-Things in your house that can contain liquid
-Things you can find in a toilet
-Anything related to Japan
-Anything related to Singapore
-Anything related to China
-Anything related to India
-Anything related to Europe
-Things you can find at an airport
-Anything related to the USA
-Things you can find in an airplane
-Things you can find in a place of worship
-Things you can find in a classroom
-
-Foreign loan words
-Languages, language families, creoles, or dialects
-Singlish words
-Words or phrases with a colour word
-Compound words (no spaces)
-Words with four syllables
-Words with at least four different vowels
-Words with two or more meanings
-Non-Singlish slang
-Words ending in "logy"
-Words ending in "ism"
-Root words containing "ph" or "gh"
-Onomatopeoia
-Irregular verbs
-Words with different US & UK spellings
-Words or phrases with a number
-Words ending in "ge"
-Words with 3 or more of the same letter
-Words ending in "ment"
-Words ending in "al"
-6 or more letter words with 1 vowel
-Words that start and end with the same letter
 Words ending in "est"
 Words ending in "er"
 Words ending in "tion"
@@ -479,29 +386,144 @@ Words ending in "ist"
 Words ending in "ry"
 Words ending in "ive"
 Words ending in "ian"
+Dishes with rice
 Irregular or uncountable nouns
 Adjectives that use "more" and "most"
 Words that are both a noun and a verb
 Root words that contain “q” or “x”
+Transport companies
+Jobs that were very different or didn't exist 300 years ago
+Things that smell bad
+Things you can find in a classroom
+Things you can find in a science lab (no chemical names)
+Examples of inequality or discrimination
+Things Python has that C doesn't
+World events since 2000
+Anything in Singapore’s headlines since 2000
+Obsolete technology
+Biological chemicals
+Specialisations in biology or medicine
+Specialisations in chemistry, engineering, or physics
+Items you can craft in videogames
+Ways to heal in videogames
+Ways to stay healthy
+Natural places that are not countries, cities, or states
+Things you don't want in your pocket
+Things that smell nice
+Things that bounce
+Things you can't say on national TV
+Ways to make money
+Poisonous or venomous things
+Things in your backpack that might get confiscated by airport security
+Books, games, or movies without sequels
+Things that can be seen only under an optical microscope
+Videogame skins
+Dessert or drink toppings
+Social etiquette
+Reasons to take someone's life
+Anything to do with gymming
+Anything to do with humans swimming
+Programming terms that mean something different to outsiders
+Pet peeves
+Anything to do with butter
+Anything to do with cheese
+Reasons to celebrate
+Anything related to databases or file storage
+Things you can only use once
+Things that can burst or explode
+Singapore or Singaporean traits
+Things you can't live without
+Anything related to networking
+Videogame NPCs
+Street food
+Qualities that make or break an employee
+Anything to do with fungi
+Things in PvZ
+Things associated with being poor
+Buttons you can find in a video editor
+Inconsiderate things or actions that aren't illegal
+Economics terms
+Anything related to the Singapore government
+Authority figures
+Things in the C++ standard library
+Things in the C# standard library
+Reasons to choose one programming language over another
+Things that can be described as vanilla or vanilla-flavoured
+Things that can be charged
+Things people hide
+Default keyboard shortcuts (any order, state what they do)
+Anything related to milk
+Anything related to chicken
+Anything related to beef
+Anything related to (bubble) tea
+Southeast Asian cuisine
+Reasons to skip class
+Things you can find in an Indian restaurant
+Things you can find at the bank
+Things you can find in a hotel room
+Things you can find at a construction site
+Things you can find in a bar or club
+Things you can find on the first floor of a HDB flat
+Things you can find in a train station
 Set phrases
+Things that roll
+Anything related to blood
+Anything related to the digestive system
+Ways to make a new friend
+Ways to lose a friend
+Relationship green flags
 Root words with “y” not at the end
 Root words that contain “z”
+Things people queue for
+Things that can be easily lost
+Battle passes or subscription services
+Anything related to coffee
+Anything related to alcohol
+Anything related to the nervous or endocrine system
+Reasons to keep quiet
+Singapore's critical infrastructure
+Food sold in supermarkets with a shelf life of a month or more
 Root words containing “ch”
 Root words containing “sh”
 Root words with “st” not at the end
 Words ending in “se” or “ce”
 Root words containing “gn”
-Anything related to frontend development or UI/UX
-Common programming keywords or functions
-Programming languages, libraries, or frameworks
-Data structures or algorithms
-Buttons in a text or code editor
-File extensions
-Open source software
-Shell commands
-Things Python has that C doesn't
-Programming jargon that mean something different to outsiders
-Anything related to databases or file storage
-Things C++ has that C doesn't
-Reasons to choose one programming language over another
+Items sold in a pharmacy
 Reasons a program might crash
+Anything to do with human skin
+Buttons you can find in a chat or social media app
+Common ingredients used in East Asian cuisine
+Salty things
+Anything related to oil
+Common pets or their breeds
+Things related to Amazon or their products (not things sold by third parties)
+Anything related to the immune system or pathogens
+Things that can be considered smart
+Things that make one appear young or immature
+Anything to do with magic (no spell names)
+Abilities or spells in games
+Things associated with spring
+Things associated with summer
+Superheroes
+Anything related to ancient civilisations
+Things related to Blizzard Entertainment or their games
+Something an animal can do that a human can’t
+Human genes that can be inherited
+Buttons or formulas in Excel
+Biology terms (no organism names)
+Chemistry terms (no compound names)
+Things people are insecure about
+Things that happen once a year
+Tools for online collaboration
+Reasons to be happy
+Reasons to be sad
+Reasons to be angry
+Things people memorise
+Things with zips
+Things you do once a day
+Anything related to security
+Games or challenges in games with time limits
+Things you shouldn’t touch
+Anything to do with mountains
+Things with exponential growth
+Non-living things that float

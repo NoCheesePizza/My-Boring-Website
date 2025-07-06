@@ -691,6 +691,24 @@ body {
     box-shadow: 0vw 0vw 1vw rgba(var(--theme), 1);
 }
 
+.loading {
+    animation: rotate 3s infinite linear;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    50% {
+        transform: rotate(180deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 #download {
     right: 10vw;
 }
@@ -1109,10 +1127,16 @@ body {
 
     /** bank **/
 
+    .tabContainer {
+        border-width: 0.2vw;
+    }
+
     .circleButton {
         width: 7vw;
         height: 7vw;
         font-size: 3vw;
+        bottom: 89vh;
+        border-width: 0.2vw;
     }
 
     #download {
@@ -1127,11 +1151,11 @@ body {
         display: flex;
         justify-content: flex-start;
         align-items: center;
-        height: 6.5vh;
+        height: 6.4vh;
     }
 
     .tab {
-        border-width: 0.3vw 0vw 0vw 0.3vw;
+        border-width: 0.2vw 0vw 0vw 0.2vw;
         width: 14vw;
         padding-left: 2vw;
         padding-right: 1vw;
@@ -1139,7 +1163,7 @@ body {
 
     .tab.selected {
         width: 28vw;
-        border-width: 0.3vw 0vw 0vw 0.3vw;
+        border-width: 0.2vw 0vw 0vw 0.2vw;
     }
 
     @media (max-width: 420px) {
@@ -1167,6 +1191,7 @@ body {
     #filter {
         padding-left: 4vw;
         padding-right: 4vw;
+        border-width: 0.2vw;
     }
 
     #dropdown {
@@ -1195,6 +1220,7 @@ body {
     .search {
         padding-left: 4vw;
         padding-right: 5vw;
+        border-width: 0.2vw;
     }
 
     .searchContent {
@@ -1216,6 +1242,7 @@ body {
         width: 6vw;
         aspect-ratio: 1 / 1;
         margin-right: 6vw; 
+        border-width: 0.2vw;
     }
 
     .bankNum {

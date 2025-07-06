@@ -38,6 +38,7 @@ Set.prototype.difference = function(other) {
 // let question1Map = new Map(); // map of tag (string) : questions (set)
 // let questionPool = [new Set(), new Set()]; // reconstructed whenever tag options change (not when questions option change)
 
+let isPulling = false;
 let tagRepo = []; // array of { content (string), color (string), count (number), questionIndices (set of numbers) }
 let questionRepo = [[], []]; // array of { content (string) : tagIndices (set of numbers) } for both types
 let questionPool = [new Set(), new Set()]; // set of questionIndex (number) for both types
@@ -129,11 +130,12 @@ async function pullQuestions(type) {
                 //     }
                 //     question1Map.get(tag).add(question);
                 // }
-
+                
             } else {
                 questionRepo[1].push({ content: line.trim(), tagIndices: [] });
             }
         });
+        console.log(`q${type}Size: ${questionRepo[type].length}`);
         
         // add all questions to pool whenever syncing with google docs
         questionPool[type] = new Set(Array.from({ length: questionRepo[type].length }, (_, index) => index));
@@ -149,8 +151,6 @@ async function pullQuestions(type) {
             });
         }
 
-        console.log(`done with ${type}`);
-        
     } catch (error) {
         console.log(`Error pulling type ${type} questions: ${error}`);
     }
@@ -742,9 +742,15 @@ callbacks.set("clickQuestion", ({ index, type }) => {
 });
 
 callbacks.set("pull", ({}) => {
-    Promise.all([pullQuestions(0), pullQuestions(1)]).then(() => {
-        sendBank();
-    });
+    if (!isPulling) {
+        isPulling = true;
+        sendMessage("pulling", {});
+
+        Promise.all([pullQuestions(0), pullQuestions(1)]).then(() => {
+            sendBank();
+            isPulling = false;
+        });
+    }
 });
 
 // entry point

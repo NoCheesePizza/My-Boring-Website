@@ -34,14 +34,35 @@ let chosenAnswers = null;
 let chosenQuestions = null;
 
 // focus caret at end instead of start of line
-function focusAtEnd(element) {
+function focusAt(element, isStart = false) {
     element.focus();
     const range = document.createRange();
     range.selectNodeContents(element);
-    range.collapse(false); // false = to end
+    range.collapse(isStart); // false = to end
     const selection = window.getSelection();
     selection.removeAllRanges();
     selection.addRange(range);
+}
+
+function pasteFromClipboard(event) {
+    event.preventDefault(); // stop browser from pasting raw data
+
+    // Insert clean text at caret using Selection API
+    const selection = window.getSelection();
+    if (!selection.rangeCount) return;
+
+    const range = selection.getRangeAt(0);
+    range.deleteContents();
+    range.insertNode(document.createTextNode((event.clipboardData || window.clipboardData).getData("text")));
+
+    // Move caret to end of inserted text
+    range.collapse(false);
+    selection.removeAllRanges();
+    selection.addRange(range);
+}
+
+function removeLineBreaks(str) {
+    return str.replace(/[\r\n]+/g, " ");
 }
 
 function countChars(str, char) {
@@ -266,12 +287,24 @@ function addEventListenersAnswering() {
                 element.textContent = element.textContent.trim();
 
                 if (event.key == "Enter" || event.key == "Tab") {
-                    focusAtEnd(inputs[findNextIndex(index)]);
+                    focusAt(inputs[findNextIndex(index)]);
                 } else if (event.key == "ArrowDown") {
-                    focusAtEnd(inputs[index == inputs.length - 1 ? 0 : index + 1]);
+                    focusAt(inputs[index == inputs.length - 1 ? 0 : index + 1]);
                 } else {
-                    focusAtEnd(inputs[index == 0 ? inputs.length - 1 : index - 1]);
+                    focusAt(inputs[index == 0 ? inputs.length - 1 : index - 1]);
                 }
+            }
+        });
+
+        element.addEventListener("paste", event => {
+            pasteFromClipboard(event);
+            element.textContent = removeLineBreaks(element.textContent);
+            focusAt(element);
+
+            if (document.activeElement === element) {
+                checkValidity(index);
+                checkForDuplicates();
+                saveAllInputs();
             }
         });
     });
@@ -528,7 +561,7 @@ function sendMessage(header, body) {
 }
 
 // public endpoint: "wss://my-boring-website.onrender.com", private endpoint: "ws://localhost:8080"
-const socket = new WebSocket("wss://my-boring-website.onrender.com");
+const socket = new WebSocket("ws://localhost:8080");
 const myId = localStorage.getItem("rbw_id") ?? genRandomString(32);
 const callbacks = new Map();
 
@@ -1094,7 +1127,7 @@ function buildTagDivs() {
         const filterCheckBoxDiv = document.createElement("div");
         filterCheckBoxDiv.classList.add("checkBox");
         filterCheckBoxDiv.style.borderColor = "whitesmoke";
-        filterCheckBoxDiv.style.opacity = "0.8";
+        filterCheckBoxDiv.style.opacity = "0.67";
 
         const filterCheckBoxI = document.createElement("i");
 
@@ -1208,14 +1241,14 @@ function buildQuestions1Map() {
 */
 
 callbacks.set("bank", ({ _tagRepo, _questionRepo, _tickedQuestions, _crossedQuestions, _tickedTags, _crossedTags }) => {
-    console.log(_tickedQuestions);
-    
     tagRepo = JSON.parse(_tagRepo).map(tag => ({ content: tag.content, color: tag.color, questionIndices: new Set(tag.questionIndices) }));
     questionRepo = _questionRepo;
     tickedQuestions = JSON.parse(_tickedQuestions).map(arr => new Set(arr));
     crossedQuestions = JSON.parse(_crossedQuestions).map(arr => new Set(arr));
     tickedTags = new Set(JSON.parse(_tickedTags));
     crossedTags = new Set(JSON.parse(_crossedTags));
+
+    console.log(`q0Size: ${_questionRepo[0].length}, q1Size: ${_questionRepo[1].length}`);
 
     buildTagDivs();
     buildQuestionDivs(0);
@@ -1227,11 +1260,15 @@ callbacks.set("bank", ({ _tagRepo, _questionRepo, _tickedQuestions, _crossedQues
     } else if (currTab != Tab.NONE) {
         clickQuestionsTab(currTab - 1);
     }
+
+    // reset download icon
+    const iconDiv = document.getElementById("downloadIcon");
+    iconDiv.className = "fa-solid fa-cloud-arrow-down";
+    iconDiv.onclick = () => pullBank();
+    iconDiv.style.cursor = "pointer";
 });
 
 callbacks.set("clickTag", ({ index, option }) => {
-    console.log(`currTab: ${currTab}`);
-
     switch (option) {
         case CheckOption.UNCHECKED:
             tickedTags.delete(index);
@@ -1285,6 +1322,13 @@ callbacks.set("clickQuestion", ({ index, option, type }) => {
     }
 });
 
+callbacks.set("pulling", ({}) => {
+    const iconDiv = document.getElementById("downloadIcon")
+    iconDiv.className = "fa-solid fa-arrows-rotate loading";
+    iconDiv.onclick = () => {};
+    iconDiv.style.cursor = "wait";
+});
+
 //todo ------------ bank ------------ //
 
 // logic
@@ -1308,25 +1352,23 @@ let currTab = Tab.NONE;
 let tagDivs = []; // array of tags (element)
 let questionDivs = [[], []]; // array of questions (element) for both types
 
-function removeNewLines(str) {
-    return str.replace(/[\r\n]+/g, "");
-}
-
 const searchDivs = document.querySelectorAll(".searchContent");
 searchDivs.forEach((searchDiv, i) => {
-    searchDiv.addEventListener("input", _ => {
 
-        // remove new lines (could've been copied)
-        searchDiv.textContent = removeNewLines(searchDiv.textContent);
-        const query = searchDiv.textContent.toLowerCase();
-
-        // add "search" text if empty
+    // add "search" text if empty
+    function toggleSearchText(searchDiv) {
         if (searchDiv.textContent == "") {
             searchDiv.classList.add("empty");
+            searchDiv.textContent = removeLineBreaks(searchDiv.textContent);
+            focusAt(searchDiv);
+
         } else {
             searchDiv.classList.remove("empty");
         }
+    }
 
+    // filter search results
+    function processQuery(searchDiv, query) {
         if (i == Tab.QUESTIONS1) {
             filterQuestions1(query);
 
@@ -1346,6 +1388,27 @@ searchDivs.forEach((searchDiv, i) => {
                 });
             }
         }
+    }
+
+    searchDiv.addEventListener("input", _ => {
+        toggleSearchText(searchDiv)
+        processQuery(searchDiv, searchDiv.textContent.toLowerCase());
+    });
+
+    // prevent typing new lines
+    searchDiv.addEventListener("keydown", event => {
+        if (event.key == "Enter") {
+            event.preventDefault();
+            searchDiv.blur();
+            return;
+        }
+    });
+
+    // remove new lines (could've been copied)
+    searchDiv.addEventListener("paste", event => {
+        pasteFromClipboard(event);
+        toggleSearchText(searchDiv);
+        processQuery(searchDiv, searchDiv.textContent.toLowerCase());
     });
 });
 
@@ -1366,7 +1429,7 @@ filterDiv.addEventListener("click", event => {
 
     // close -> open
     if (isFilterOpen) {
-        openMenu(menuDiv, isPhone ? "150vw" : "30vw");
+        openMenu(menuDiv, isPhone ? "120vw" : "30vw");
         dropDownDiv.classList.add("open");
     
     // open -> close
@@ -1447,8 +1510,6 @@ function setTagIcon(index, option) {
     const bankNumDiv = bankRow.querySelector(".bankNum");
     const bankContentDiv = bankRow.querySelector(".bankContent");
 
-    console.log(`index: ${index}, size: ${tagDivs.length}, checkBoxI: ${checkBoxI}, bankRow: ${bankRow}`);
-    
     // set icon for check box
     checkBoxI.className = optionIcons[option];
 
@@ -1521,6 +1582,7 @@ function setQuestionIcon(index, option, type) {
 
 // only for type 1 (type 2 no tags)
 function buildPoolFromTags() {
+    question1Pool = new Set();
 
     // set union
     tickedTags.forEach(tagIndex => {
