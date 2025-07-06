@@ -561,7 +561,7 @@ function sendMessage(header, body) {
 }
 
 // public endpoint: "wss://my-boring-website.onrender.com", private endpoint: "ws://localhost:8080"
-const socket = new WebSocket("ws://localhost:8080");
+const socket = new WebSocket("wss://my-boring-website.onrender.com");
 const myId = localStorage.getItem("rbw_id") ?? genRandomString(32);
 const callbacks = new Map();
 
