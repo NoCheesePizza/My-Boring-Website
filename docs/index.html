@@ -16,9 +16,9 @@
   <body>
     <div id="bank" style="display: none">
       <div class="tabs">
-        <div class="tab" onclick="clickTagsTab()" id="tagsTab">Tags</div>
+        <div class="tab" id="tagsTab" onclick="clickTagsTab()">Tags</div>
         <div class="tab" onclick="clickQuestionsTab(0)">Type 1 Questions</div>
-        <div class="tab" onclick="clickQuestionsTab(1)">Type 2 Questions</div>
+        <div class="tab" id="questions2Tab" onclick="clickQuestionsTab(1)">Type 2 Questions</div>
       </div>
       <div class="circleButton" id="download" onclick="pullBank()">
         <i class="fa-solid fa-cloud-arrow-down" id="downloadIcon"></i>
@@ -29,6 +29,9 @@
       <div class="tabContainer">
         <div class="scrollRegion" id="tagsRegion" style="display: none;">
           <div class="searchBar">
+            <div class="checkBox" onclick="clickTag(-1)">
+              <i class="fa-solid fa-circle checkMark" id="tagOption"></i>
+            </div>
             <div class="search">
               <div class="searchContent empty" contenteditable="true"></div>
               <i class="fa-solid fa-magnifying-glass"></i>
@@ -36,8 +39,11 @@
           </div>
           <div id="tags"></div>
         </div>
-        <div class="scrollRegion" id="questions1Region" style="display: none">
+        <div class="scrollRegion" id="questions1Region" style="display: none;">
           <div class="searchBar">
+            <div class="checkBox" onclick="clickQuestion(-1, 0)">
+              <i class="fa-solid fa-circle checkMark" id="question1Option"></i>
+            </div>
             <div id="filter">
               <i class="fa-solid fa-filter"></i></i>
               <div class="filterTitle">Filter</div>
@@ -54,6 +60,9 @@
         </div>
         <div class="scrollRegion" id="questions2Region" style="display: none;">
           <div class="searchBar">
+            <div class="checkBox" onclick="clickQuestion(-1, 1)">
+              <i class="fa-solid fa-circle checkMark" id="question2Option"></i>
+            </div>
             <div class="search">
               <div class="searchContent empty" contenteditable="true"></div>
               <i class="fa-solid fa-magnifying-glass"></i>
@@ -247,7 +256,10 @@
         <div class="pText">Players</div>
         <div class="middleColumn" id="players">
           </div>
-      <div class="rename" id="rename">Rename Player</div>
+      <div class="buttonColumn">    
+        <div class="configButton" id="renounce">Renounce Leadership</div> 
+        <div class="configButton" id="rename">Rename Player</div>
+      </div>
     </div>
   </body>
   <script src="index.js">

@@ -483,27 +483,6 @@ body {
     text-align: right;
 }
 
-.rename {
-    background-color: var(--lgrey);
-    border-radius: 1vw;
-    cursor: pointer;
-    text-align: center;
-    font-size: var(--sSize);
-    height: 2vw;
-    align-content: center; 
-    transition: box-shadow 0.5s ease, background-color 0.25s ease, transform 0.5s ease;
-}
-
-.rename:hover {
-    box-shadow: 0vw 0vw 1.5vw rgba(var(--theme), 0.67);
-    transform: scale(1.07);
-    background-color: rgba(var(--theme), 0.33);
-}
-
-.rename:active {
-    background-color:rgba(var(--theme), 0.67);
-}
-
 .cText {
     color: var(--grey);
     font-weight: bold;
@@ -759,6 +738,10 @@ body {
     position: relative;
 }
 
+#questions2Tab {
+    border-right-width: 0.1vw;
+}
+
 .scrollRegion {
     position: absolute;
     overflow-y: auto;
@@ -895,6 +878,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    align-self: center;
     cursor: pointer;
 }
 
@@ -1087,11 +1071,6 @@ body {
 
     .pScore {
         max-width: 17vw;
-    }
-
-    .rename {
-        border-radius: 3vw;
-        height: 5vw;
     }
 
     .sName i {

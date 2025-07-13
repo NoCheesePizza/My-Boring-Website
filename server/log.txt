@@ -498,6 +498,7 @@ Anything related to oil
 Common pets or their breeds
 Things related to Amazon or their products (not things sold by third parties)
 Anything related to the immune system or pathogens
+
 Things that can be considered smart
 Things that make one appear young or immature
 Anything to do with magic (no spell names)
@@ -527,3 +528,21 @@ Things you shouldn’t touch
 Anything to do with mountains
 Things with exponential growth
 Non-living things that float
+Names of symbols, inclusive of foreign letters
+Types of maps
+Names of measuring devices
+Things predominantly stored in jars
+Figurative or literal engines
+Names of religions, religious orders, religious schools of thought, and cults
+Names of taxonomical groups higher on the hierarchy than Family (clades and common names are acceptable)
+Names of subatomic or massless particles
+Things you can ride, figurative or otherwise
+States, Territories, Prefectures or Provinces
+Deserts or countries with predominantly arid climates
+Plants not in known recipes, cuisines or drinks
+Types of geographical formations formed primarily by but not of water
+Famous paradoxes, fallacies or non sequiturs
+Entities created for the sole purpose of storing nonhuman entities
+Names of known constants, constant quantities, or numeric identities commonly provided or assumed as a given numeric value
+Names of singers, vocalists, coverers, voice actors, voice providers, voicebanks
+Names of mathematically defined well-known geometric structures

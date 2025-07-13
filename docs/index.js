@@ -16,6 +16,9 @@
     [done] don't hard code top bars height
     [done] timer flashing
     [done] bug where capitalised words don't have similarity check
+    [done] add phase checks to server
+    [?] reconnecting to server does not refresh page
+    save seenQuestions in localStorage
 */
 
 //todo ------------ "global" ------------ //
@@ -521,6 +524,11 @@ document.getElementById("rename").addEventListener("click", _ => {
     }
 });
 
+// renounce button
+document.getElementById("renounce").addEventListener("click", _ => {
+    sendMessage("renounce", { id: myId });
+});
+
 // reset button
 document.getElementById("resetGame").addEventListener("click", _ => {
     if (confirm("Are you sure you want to reset all scores?")) {
@@ -552,7 +560,7 @@ function genRandomString(length) {
 }
 
 function sendMessage(header, body) {
-    if (isConnected) {
+    if (socket && socket.readyState === WebSocket.OPEN) {
         console.log(`sent: ${header}`);
         socket.send(JSON.stringify({ header, body }));
     } else {
@@ -561,18 +569,19 @@ function sendMessage(header, body) {
 }
 
 // public endpoint: "wss://my-boring-website.onrender.com", private endpoint: "ws://localhost:8080"
-const socket = new WebSocket("wss://my-boring-website.onrender.com");
+const endpoint = "ws://localhost:8080";
 const myId = localStorage.getItem("rbw_id") ?? genRandomString(32);
 const callbacks = new Map();
+const Phase = Object.freeze({ HOME: 0, ANSWERING: 1, VOTING: 2 });
 
 let username = localStorage.getItem("rbw_username") ?? "New Player";
 let score = localStorage.getItem("rbw_score") ?? 0;
 let deltaScore = localStorage.getItem("rbw_deltaScore") ?? 0;
 let theme = localStorage.getItem("rbw_theme") ?? "#32C8FA";
 
+let socket = null
 let playerCount = []; // for voting phase
 let isLeader = false;
-let isConnected = false; // check if socket is open before sending message
 
 localStorage.setItem("rbw_id", myId);
 
@@ -583,31 +592,42 @@ localStorage.setItem("rbw_id", myId);
 
 document.getElementById("color").value = theme;
 
-socket.addEventListener("open", () => {
+function connect() {
+    socket = new WebSocket(endpoint);
 
-    // join server
-    isConnected = true;
-    sendMessage("enter", { id: myId, username, score, deltaScore, theme });
-});
+    socket.addEventListener("open", () => {
+        sendMessage("enter", { id: myId, username, score, deltaScore, theme });
+    });
 
-socket.addEventListener("message", message => {
-    const msg = JSON.parse(message.data);
-    console.log(`received: ${msg.header}`);
+    // while is not connected, keep trying to connect to server
+    socket.addEventListener("close", () => {
+        console.log("connection closed, attempting to reconnect");
+        setTimeout(() => {
+            connect();
+        }, 5000);
+    });
 
-    if (callbacks.has(msg.header)) {
-        callbacks.get(msg.header)(msg.body);
-    } else {
-        console.error(`header ${msg.header} does not exist`);
-    }
-});
+    socket.addEventListener("message", message => {
+        const msg = JSON.parse(message.data);
+        console.log(`received: ${msg.header}`);
 
-// show loading page after 1 s if not connected
-setTimeout(() => {
-    if (!isConnected) {
-        document.getElementById("loading").style.display = "flex";
-        document.getElementById("loading").style.display = "flex";
-    }
-}, 1000);
+        if (callbacks.has(msg.header)) {
+            callbacks.get(msg.header)(msg.body);
+        } else {
+            console.error(`header ${msg.header} does not exist`);
+        }
+    });
+    
+    // show loading page after 1 s if not connected
+    setTimeout(() => {
+        if (socket.readyState !== WebSocket.OPEN) {
+            document.getElementById("loading").style.display = "flex";
+            document.getElementById("loading").style.display = "flex";
+        }
+    }, 1000);
+}
+
+connect();
 
 /*
     <div class="player">
@@ -639,12 +659,14 @@ callbacks.set("players", ({ info, leaderId }) => {
     if (leaderId == myId) {
         document.getElementById("startGame").style.display = "block";
         document.getElementById("resetGame").style.display = "block";
+        document.getElementById("renounce").style.display = "block";
 
     // hide buttons if not leader
     } else {
         isLeader = false;
         document.getElementById("startGame").style.display = "none";
         document.getElementById("resetGame").style.display = "none";
+        document.getElementById("renounce").style.display = "none";
     }
 
     // save stats to localStorage (no way players doesn't have myId)
@@ -720,9 +742,7 @@ callbacks.set("transit", ({ to, leaderId }) => {
     document.getElementById("loading").style.display = "none";
 
     switch (to) {
-
-        // home page (if not viewing question bank)
-        case 0:
+        case Phase.HOME:
             if (currTab == Tab.NONE) {
                 answeringDiv.style.display = "none";
                 votingDiv.style.display = "none";
@@ -732,8 +752,7 @@ callbacks.set("transit", ({ to, leaderId }) => {
             localStorage.removeItem("rbw_inputs");
             break;
 
-        // answering page
-        case 1:
+        case Phase.ANSWERING:
             currTab = Tab.NONE;
             document.getElementById("bank").style.display = "none";
 
@@ -742,8 +761,7 @@ callbacks.set("transit", ({ to, leaderId }) => {
             answeringDiv.style.display = "block";
             break;
 
-        // voting page
-        case 2:
+        case Phase.VOTING:
             currTab = Tab.NONE;
             document.getElementById("bank").style.display = "none";
 
@@ -883,11 +901,8 @@ callbacks.set("answers", ({ question, number, answerCount, info, shldShowUsernam
     selection = new Map(selectedOptions).get(myId);
     const toClick = []; // vector of { row, col }
 
-    // for loop faster than filter / reduce / any fancy bullshit
-    spectatorCount = 0;
-    players.forEach((value, key) => {
-        spectatorCount += value.isNew == true;
-    });
+    // for loop faster than filter / reduce / any fancy bullshit...nvm I decided I wanna learn the fancy bullshit
+    spectatorCount = [...players.values()].reduce((sum, value) => sum += value.isNew == true, 0);
 
     // render all answers
     answers.forEach(({ input, answer, votes, score, id, username }, index) => {
@@ -1240,7 +1255,7 @@ function buildQuestions1Map() {
 }
 */
 
-callbacks.set("bank", ({ _tagRepo, _questionRepo, _tickedQuestions, _crossedQuestions, _tickedTags, _crossedTags }) => {
+callbacks.set("bank", ({ _tagRepo, _questionRepo, _tickedQuestions, _crossedQuestions, _tickedTags, _crossedTags, tagOption, questionOptions }) => {
     tagRepo = JSON.parse(_tagRepo).map(tag => ({ content: tag.content, color: tag.color, questionIndices: new Set(tag.questionIndices) }));
     questionRepo = _questionRepo;
     tickedQuestions = JSON.parse(_tickedQuestions).map(arr => new Set(arr));
@@ -1248,17 +1263,20 @@ callbacks.set("bank", ({ _tagRepo, _questionRepo, _tickedQuestions, _crossedQues
     tickedTags = new Set(JSON.parse(_tickedTags));
     crossedTags = new Set(JSON.parse(_crossedTags));
 
-    console.log(`q0Size: ${_questionRepo[0].length}, q1Size: ${_questionRepo[1].length}`);
-
     buildTagDivs();
     buildQuestionDivs(0);
     buildQuestionDivs(1);
 
-    // reload current tab
+    // change icon for global check box
+    document.getElementById("tagOption").className = optionIcons[tagOption];
+    document.getElementById(`question1Option`).className = optionIcons[questionOptions[0]];
+    document.getElementById(`question2Option`).className = optionIcons[questionOptions[1]];
+
+    // reload tab that player is on
     if (currTab == Tab.TAGS) {
-        clickTagsTab();
+        clickTagsTab(tagOption);
     } else if (currTab != Tab.NONE) {
-        clickQuestionsTab(currTab - 1);
+        clickQuestionsTab(currTab - 1, questionOptions[currTab - 1]);
     }
 
     // reset download icon
@@ -1269,27 +1287,54 @@ callbacks.set("bank", ({ _tagRepo, _questionRepo, _tickedQuestions, _crossedQues
 });
 
 callbacks.set("clickTag", ({ index, option }) => {
-    switch (option) {
-        case CheckOption.UNCHECKED:
-            tickedTags.delete(index);
-            crossedTags.delete(index);
-            break;
 
-        case CheckOption.TICKED:
-            tickedTags.add(index);
-            crossedTags.delete(index);
-            break;
+    // change all tags
+    if (index == -1) {
+        switch (option) {
+            case CheckOption.UNCHECKED:
+                tickedTags = new Set();
+                crossedTags = new Set();
+                break;
 
-        case CheckOption.CROSSED:
-            crossedTags.add(index);
-            tickedTags.delete(index);
-            break;
+            case CheckOption.TICKED:
+                tickedTags = new Set(Array.from({ length: tagRepo.length }, (_, index) => index));
+                crossedTags = new Set();
+                break;
+
+            case CheckOption.CROSSED:
+                crossedTags = new Set(Array.from({ length: tagRepo.length }, (_, index) => index));
+                tickedTags = new Set();
+                break;
+        }
+
+    // change 1 tag
+    } else {
+        switch (option) {
+            case CheckOption.UNCHECKED:
+                tickedTags.delete(index);
+                crossedTags.delete(index);
+                break;
+
+            case CheckOption.TICKED:
+                tickedTags.add(index);
+                crossedTags.delete(index);
+                break;
+
+            case CheckOption.CROSSED:
+                crossedTags.add(index);
+                tickedTags.delete(index);
+                break;
+        }
+    }
+
+    if (index == -1) {
+        document.getElementById("tagOption").className = optionIcons[option];
     }
 
     if (currTab == Tab.TAGS) {
-        clickTagsTab();
+        clickTagsTab(index == -1 ? option : null);
     } else {
-        clickQuestionsTab(currTab - 1);
+        clickQuestionsTab(currTab - 1, index == -1 ? option : null);
     }
 });
 
@@ -1298,21 +1343,47 @@ callbacks.set("clickQuestion", ({ index, option, type }) => {
         return;
     }
 
-    switch (option) {
-        case CheckOption.UNCHECKED:
-            tickedQuestions[type].delete(index);
-            crossedQuestions[type].delete(index);
-            break;
+    // change all questions
+    if (index == -1) {
+        switch (option) {
+            case CheckOption.UNCHECKED:
+                tickedQuestions[type] = new Set();
+                crossedQuestions[type] = new Set();
+                break;
 
-        case CheckOption.TICKED:
-            tickedQuestions[type].add(index);
-            crossedQuestions[type].delete(index);
-            break;
+            case CheckOption.TICKED:
+                tickedQuestions[type] = new Set(Array.from({ length: questionRepo[type].length }, (_, index) => index));
+                crossedQuestions[type] = new Set();
+                break;
 
-        case CheckOption.CROSSED:
-            crossedQuestions[type].add(index);
-            tickedQuestions[type].delete(index);
-            break;
+            case CheckOption.CROSSED:
+                crossedQuestions[type] = new Set(Array.from({ length: questionRepo[type].length }, (_, index) => index));
+                tickedQuestions[type] = new Set();
+                break;
+        }
+
+    // change 1 question
+    } else {
+        switch (option) {
+            case CheckOption.UNCHECKED:
+                tickedQuestions[type].delete(index);
+                crossedQuestions[type].delete(index);
+                break;
+
+            case CheckOption.TICKED:
+                tickedQuestions[type].add(index);
+                crossedQuestions[type].delete(index);
+                break;
+
+            case CheckOption.CROSSED:
+                crossedQuestions[type].add(index);
+                tickedQuestions[type].delete(index);
+                break;
+        }
+    }
+
+    if (index == -1) {
+        document.getElementById(`question${type + 1}Option`).className = optionIcons[option];
     }
 
     if (currTab == Tab.TAGS) {

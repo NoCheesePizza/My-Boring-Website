@@ -4,6 +4,8 @@ const cheerio = require("cheerio");
 const http = require("http");
 const url = require("url");
 const fs = require("fs");
+const crypto = require("crypto");
+const { loadEnvFile } = require("process");
 
 Set.prototype.union = function(other) {
     return new Set([...this, ...other]);
@@ -32,17 +34,14 @@ Set.prototype.difference = function(other) {
     ^ question object in questionRepo (formerly questions1/2) also keeps track of this for rendering purposes
 */
 
-// const Option = Object.freeze({ UNCHECKED: 0, TICKED: 1, CROSSED: 2 });
-// let tagRepo = []; // { tag (string), option (enum) }
-// let questionRepo = [[], []]; // { question (string), tags (list), option (enum), isInPool (bool) }
-// let question1Map = new Map(); // map of tag (string) : questions (set)
-// let questionPool = [new Set(), new Set()]; // reconstructed whenever tag options change (not when questions option change)
-
 let isPulling = false;
+let setLeaderTimerId = null;
+
 let tagRepo = []; // array of { content (string), color (string), count (number), questionIndices (set of numbers) }
 let questionRepo = [[], []]; // array of { content (string) : tagIndices (set of numbers) } for both types
 let questionPool = [new Set(), new Set()]; // set of questionIndex (number) for both types
 let wasPoolChanged = [false, false]; // only update pool when game starts if there were changes to the check boxes
+let seenQuestions = [new Set(), new Set()];
 
 // ticked and crossed questions guaranteed no overlap
 let tickedQuestions = [new Set(), new Set()]; // set of questionIndex (number) for both types
@@ -50,8 +49,30 @@ let crossedQuestions = [new Set(), new Set()]; // set of questionIndex (number) 
 let tickedTags = new Set(); // set of tagIndex (number)
 let crossedTags = new Set(); // set of tagIndex (number)
 
+const Phase = Object.freeze({ HOME: 0, ANSWERING: 1, VOTING: 2 });
 const CheckOption = Object.freeze({ UNCHECKED: 0, TICKED: 1, CROSSED: 2 }); // "Option" was taken already :(
 const hexValues = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F"];
+
+// checking/unchecking all tags/questions at once
+let tagOption = CheckOption.TICKED;
+let questionOptions = [CheckOption.UNCHECKED, CheckOption.TICKED];
+
+function shuffle(array) {
+    const ret = array;
+    for (let i = 0; i < ret.length; ++i) {
+        const j = crypto.randomInt(0, ret.length);
+        [ret[i], ret[j]] = [ret[j], ret[i]]; 
+    }
+    return ret;
+}
+
+function circularSlice(array, start, end) {
+    const ret = [];
+    for (let i = start; i < end; ++i) {
+        ret.push(array[i % array.length]);
+    }
+    return ret;
+}
 
 function genRandomColor() {
     let ret = "#";
@@ -255,8 +276,9 @@ const Config = Object.freeze({ LETTER: 0, DURATION: 1, QUESTIONS: 2, USERNAME: 3
 
 // game data
 let leaderId = "";
-let phase = 0; // 0 == home, 1 == answering, 2 == voting
+let phase = Phase.HOME;
 let questions = [];
+let questionIndices = []; // for seen questions
 let letter = "A";
 let letterType = 0; // contains but not start with once every 3 rounds (1 contains 2 start in that order)
 let timer = 0;
@@ -293,8 +315,8 @@ function countDown() {
         --timer;
 
         // leader initiated a restart from answering page
-        if (shldRestart && phase == 1) {
-            phase = 0;
+        if (shldRestart && phase == Phase.ANSWERING) {
+            phase = Phase.HOME;
             sendData();
             shldRestart = false;
             return;
@@ -329,19 +351,16 @@ function sendData(id) {
     sendMessage("transit", { to: phase, leaderId }, id);
 
     switch (phase) {
-        // home
-        case 0:
+        case Phase.HOME:
             sendMessage("players", { info: Array.from(players.entries()), leaderId }, id);
             sendMessage("config", { values: config }, id);
             break;
 
-        // answering
-        case 1:
+        case Phase.ANSWERING:
             sendMessage("questions", { questions, letter, letterType, type: config[Config.TYPE] }, id);
             break;
 
-        // voting
-        case 2:
+        case Phase.VOTING:
 
             // send entire player info to determine how many needed to answer for each question in case someone dc's
             sendMessage("answers", { 
@@ -358,15 +377,17 @@ function sendData(id) {
     }
 }
 
-function sendBank() {
+function sendBank(id) {
     sendMessage("bank", { 
         _tagRepo: JSON.stringify(tagRepo.map(tag => ({ content: tag.content, color: tag.color, questionIndices: Array.from(tag.questionIndices) }))), 
         _questionRepo: questionRepo, 
         _tickedQuestions: JSON.stringify(tickedQuestions.map(set => Array.from(set))), 
         _crossedQuestions: JSON.stringify(crossedQuestions.map(set => Array.from(set))),
         _tickedTags: JSON.stringify(Array.from(tickedTags)),
-        _crossedTags: JSON.stringify(Array.from(crossedTags))
-    });
+        _crossedTags: JSON.stringify(Array.from(crossedTags)),
+        tagOption,
+        questionOptions
+    }, id);
 }
 
 function goNext() {
@@ -385,7 +406,7 @@ function goNext() {
 
     // last question
     if (currQuestion == config[Config.QUESTIONS]) {
-        phase = 0;
+        phase = Phase.HOME;
         sendMessage("transit", { to: phase });
     } else {
         ++currQuestion;
@@ -397,7 +418,7 @@ function goNext() {
 
 // new player joined
 callbacks.set("enter", ({ id, username, score, deltaScore, theme }) => {
-    if (players.size == 0) {
+    if (players.size == 0 && leaderId == "") {
         leaderId = id;
     }
 
@@ -407,14 +428,26 @@ callbacks.set("enter", ({ id, username, score, deltaScore, theme }) => {
         players.set(id, { username: player.username, score: player.score, deltaScore: player.deltaScore, isNew: player.isNew, theme: player.theme });
         dcedPlayers.delete(id);
 
-        // readd votes back when dced player returns
-        if (phase == 2 && selectedOptions[currQuestion].has(id)) {
-            selectedOptions[currQuestion].get(id).forEach((option, index) => {
-                if (option != -1) {
-                    submissions[currQuestion][index].score += points[option]
-                    ++submissions[currQuestion][index].votes;
-                }
-            });
+        // stop looking for new leader if old leader reconnects
+        if (setLeaderTimerId && id == leaderId) {
+            clearTimeout(setLeaderTimerId);
+        }
+        
+        if (phase == Phase.VOTING) {
+            
+            // read votes back when dced player returns
+            if (selectedOptions[currQuestion].has(id)) {
+                selectedOptions[currQuestion].get(id).forEach((option, index) => {
+                    if (option != -1) {
+                        submissions[currQuestion][index].score += points[option]
+                        ++submissions[currQuestion][index].votes;
+                    }
+                });
+                
+            // set isNew to true if in voting phase and player did not submit answer
+            } else {
+                players.get(id).isNew = true;
+            }
         }
 
     } else {
@@ -425,12 +458,12 @@ callbacks.set("enter", ({ id, username, score, deltaScore, theme }) => {
     sendData();
 
     // send bank data to the new player
-    sendBank();
+    sendBank(id);
 });
 
 // player changed username
 callbacks.set("rename", ({ username, id }) => {
-    if (players.has(id)) {
+    if (players.has(id) && phase == Phase.HOME) {
         players.get(id).username = username;
         sendMessage("players", { info: Array.from(players.entries()), leaderId })
     }
@@ -439,12 +472,18 @@ callbacks.set("rename", ({ username, id }) => {
 // player changed config
 // row refers to config type, column refers to config option
 callbacks.set("config", ({ row, column }) => {
-    config[row] = column;
-    sendMessage("config", { values: config });
+    if (phase == Phase.HOME) {
+        config[row] = column;
+        sendMessage("config", { values: config });
+    }
 });
 
 // reset all scores
 callbacks.set("reset", ({}) => {
+    if (phase != Phase.HOME) {
+        return;
+    }
+
     players.forEach((value, key) => {
         value.score = 0;
         value.deltaScore = 0;
@@ -457,9 +496,17 @@ callbacks.set("reset", ({}) => {
 });
 
 callbacks.set("color", ({ theme, id }) => {
-    if (players.has(id)) {
+    if (players.has(id) && phase == Phase.HOME) {
         players.get(id).theme = theme;
         sendMessage("players", { info: Array.from(players.entries()), leaderId });
+    }
+});
+
+callbacks.set("renounce", ({ id }) => {
+    if (id == leaderId && players.size != 0 && phase == Phase.HOME) {
+        keys = [...players.keys()]; // all player ids
+        leaderId = keys[(keys.findIndex(key => key == id) + 1) % players.size]
+        sendData();
     }
 });
 
@@ -477,12 +524,10 @@ callbacks.set("transit", ({ to }) => {
     phase = to;
     
     switch (to) {
-        // home
-        case 0:
+        case Phase.HOME:
             break;
 
-        // answering
-        case 1:
+        case Phase.ANSWERING:
 
             const type = config[Config.TYPE];
             if (wasPoolChanged[type]) {
@@ -490,13 +535,25 @@ callbacks.set("transit", ({ to }) => {
                 wasPoolChanged[type] = false;            
             }
 
-            // prepare randomly selected questions
-            questions = [...questionPool[type]].sort((a, b) => { 
-                return Math.random() - 0.5;
-            }).slice(0, config[Config.QUESTIONS] + 1).map(questionIndex => {
-                return questionRepo[type][questionIndex].content;
-            });
+            console.log(`seen count before: ${seenQuestions[type].size}`);
 
+            // filter out seen questions (and reset seen questions if not enough questions)
+            let currQuestions = questionPool[type].difference(seenQuestions[type]); // set
+            if (currQuestions.size < config[Config.QUESTIONS] + 1) {
+                seenQuestions[type] = new Set();
+                currQuestions = questionPool[type];
+            }
+            
+            // shuffle questions, then pick n number starting at index questions[0] % questions.length (which is a number)
+            questions = shuffle([...currQuestions]);
+            questionIndices = []
+            if (questions.length != 0) {
+                questionIndices = circularSlice(questions, questions[0], questions[0] + config[Config.QUESTIONS] + 1);
+                questions = questionIndices.map(questionIndex => questionRepo[type][questionIndex].content);
+            }
+
+            //todo remove
+            console.log(`seen count after: ${seenQuestions[type].size}`);
             fs.writeFileSync("log.txt", [...questionPool[type]].map(index => questionRepo[type][index].content).join("\n"), "utf-8");
 
             // any letter (server decides)
@@ -518,9 +575,8 @@ callbacks.set("transit", ({ to }) => {
 
             break;
 
-        // voting (not hit, to trigger something after answering phase put it below in submit)
-        case 2:
-
+        // not reached, to trigger something after answering phase put it below in submit
+        case Phase.VOTING:
             break;
     }
 
@@ -530,7 +586,7 @@ callbacks.set("transit", ({ to }) => {
 callbacks.set("submit", ({ id, submission }) => {
     
     // technically if player quits during answering phase it won't even send this event anyway
-    if (!players.has(id)) {
+    if (!players.has(id) || phase != Phase.ANSWERING) {
         return;
     }
 
@@ -542,8 +598,11 @@ callbacks.set("submit", ({ id, submission }) => {
     });
 
     // go to next phase once everyone has submitted their answers
-    if (++submissionCount == players.size) {
-        phase = 2;
+    if (++submissionCount >= players.size) {
+        phase = Phase.VOTING;
+        seenQuestions[config[Config.TYPE]] = seenQuestions[config[Config.TYPE]].union(questionIndices);
+        console.log(`questions: ${questionIndices.length}`);
+        console.log(`seen: ${seenQuestions[config[Config.TYPE]].size}`);
 
         // initialise each player's options to tally if they dc (should be in the same order as submissions)
         players.forEach((value, key) => {
@@ -570,7 +629,7 @@ callbacks.set("submit", ({ id, submission }) => {
 // client clicks on a number to vote
 // row == answer number, col == option number
 callbacks.set("vote", ({ id, row, col }) => {
-    if (!selectedOptions[currQuestion].has(id)) {
+    if (!selectedOptions[currQuestion].has(id) || phase != Phase.VOTING) {
         return;
     }
 
@@ -603,7 +662,7 @@ callbacks.set("vote", ({ id, row, col }) => {
 });
 
 callbacks.set("next", ({}) => {
-    if (canGoNext) {
+    if (canGoNext && phase == Phase.VOTING) {
         canGoNext = false;
 
         if (submissions[currQuestion].length == 0) {
@@ -616,69 +675,50 @@ callbacks.set("next", ({}) => {
 });
 
 callbacks.set("restart", ({}) => {
-    shldRestart = true;
-});
-
-/*
-callbacks.set("tag", ({ index, option }) => {
-    if (index > -1 && index < tagRepo.length) {
-        tagRepo[index].option = option; // for ui
-
-        const tag = tagRepo[index].tag;
-        tickedTags.delete(tag);
-        crossedTags.delete(tag);
-
-        // for logic
-        if (option == Option.TICKED) {
-            tickedTags.add(tag);
-        } else if (option == Option.CROSSED) {
-            crossedTags.add(tag);
-        }
-
-        buildPool();
+    if (phase == Phase.ANSWERING) {
+        shldRestart = true;
     }
 });
-
-// type == 0 (type 1) or 1 (type 2)
-callbacks.set("question", ({ type, index, option }) => {
-    if ((type == 1 || type == 2) && (index > -1 && index < questionRepo[type].length)) {
-        questionRepo[type][index].option = option; // for ui
-
-        // for logic
-        const question = questionRepo[type][index].question;
-        crossedQuestions[type].delete(question);
-        tickedQuestions[type].delete(question);
-
-        if (option == Option.TICKED) {
-            tickedQuestions[type].add(question);
-            questionPool[type].add(question);
-            questionRepo[type][index].isInPool = true;
-
-        } else if (option == Option.CROSSED) {
-            crossedQuestions[type].add(question);
-            questionPool[type].delete(question);
-            questionRepo[type][index].isInPool = false;
-
-        // unchecked, which only applies to type 1
-        } else {
-            buildPoolFromTags();
-        }
-    }
-});
-*/
 
 callbacks.set("clickTag", ({ index }) => {
-    if (index < 0 || index >= tagRepo.length) {
-        console.log(`index ${index} out of range of 0 to ${tagRepo.length - 1}`);
+    if (index < -1 || index >= tagRepo.length || phase != Phase.HOME) {
+        console.log(`index ${index} out of range of -1 to ${tagRepo.length - 1}`);
         return;
     }
 
     wasPoolChanged[0] = true;
 
+    // change all tags
+    if (index == -1) {
+        switch (tagOption) {
+
+            // uncheck -> tick
+            case CheckOption.UNCHECKED:
+                tickedTags = new Set(Array.from({ length: tagRepo.length }, (_, index) => index));
+                break;
+
+            // tick -> cross
+            case CheckOption.TICKED:
+                tickedTags = new Set();
+                crossedTags = new Set(Array.from({ length: tagRepo.length }, (_, index) => index));
+                break;
+
+            // cross -> uncheck
+            case CheckOption.CROSSED:
+                crossedTags = new Set();
+                break;
+        }
+
+        tagOption = (tagOption + 1) % 3;
+        sendMessage("clickTag", { index, option: tagOption });
+        return;
+    }
+
     // tick -> cross
     if (tickedTags.has(index)) {
         tickedTags.delete(index);
         crossedTags.add(index);
+
         sendMessage("clickTag", { index, option: CheckOption.CROSSED });
     
     // cross -> uncheck
@@ -694,17 +734,43 @@ callbacks.set("clickTag", ({ index }) => {
 });
 
 callbacks.set("clickQuestion", ({ index, type }) => {
-    if (type < 0 || type > 1) {
+    if (type < 0 || type > 1 || phase != Phase.HOME) {
         console.log(`type ${type} is out of range of 0 to 1`);
         return;
     }
     
-    if (index < 0 || index >= questionRepo[type].length) {
-        console.log(`index ${index} is out of range of 0 to ${questionRepo[type].length - 1}`);
+    if (index < -1 || index >= questionRepo[type].length) {
+        console.log(`index ${index} is out of range of -1 to ${questionRepo[type].length - 1}`);
         return;
     }
 
     wasPoolChanged[type] = true;
+
+    // change all questions
+    if (index == -1) {
+        switch (questionOptions[type]) {
+        
+            // uncheck -> tick (type 1)
+            case CheckOption.UNCHECKED:
+                tickedQuestions[type] = new Set(Array.from({ length: questionRepo[type].length }, (_, index) => index));
+                break;
+
+            // tick -> cross
+            case CheckOption.TICKED:
+                tickedQuestions[type] = new Set();
+                crossedQuestions[type] = new Set(Array.from({ length: questionRepo[type].length }, (_, index) => index));
+                break;
+
+            // cross -> uncheck (type 1), cross -> tick (type 2)
+            case CheckOption.CROSSED:
+                crossedQuestions[type] = new Set();
+                break;
+        }
+
+        questionOptions[type] = type == 0 ? (questionOptions[type] + 1) % 3 : (questionOptions[type] + 1) % 2;
+        sendMessage("clickQuestion", { index, option: questionOptions[type], type });
+        return;
+    }
 
     if (type == 0) {
         
@@ -742,7 +808,7 @@ callbacks.set("clickQuestion", ({ index, type }) => {
 });
 
 callbacks.set("pull", ({}) => {
-    if (!isPulling) {
+    if (!isPulling && phase == Phase.HOME) {
         isPulling = true;
         sendMessage("pulling", {});
 
@@ -804,8 +870,19 @@ wss.on("connection", ws => {
             sockets.delete(id);
         }
 
-        // find new leader
-        leaderId = players.keys().next().value ?? "";
+        // find new leader after 60 s if leader doesn't reconnect
+        if (!setLeaderTimerId && id == leaderId) {
+            setLeaderTimerId = setTimeout(() => {
+                const prevLeaderId = leaderId
+                leaderId = players.has(leaderId) ? leaderId : players.keys().next().value ?? "";
+                setLeaderTimerId = null;
+                
+                if (prevLeaderId != leaderId) {
+                    sendData();
+                }
+            }, 60000);
+        }
+
         sendData();
     });
 });
