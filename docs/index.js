@@ -569,7 +569,7 @@ function sendMessage(header, body) {
 }
 
 // public endpoint: "wss://my-boring-website.onrender.com", private endpoint: "ws://localhost:8080"
-const endpoint = "ws://localhost:8080";
+const endpoint = "wss://my-boring-website.onrender.com";
 const myId = localStorage.getItem("rbw_id") ?? genRandomString(32);
 const callbacks = new Map();
 const Phase = Object.freeze({ HOME: 0, ANSWERING: 1, VOTING: 2 });
