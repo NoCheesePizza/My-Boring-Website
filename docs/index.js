@@ -410,7 +410,7 @@ function addEventListenersVoting() {
 
 // fixed number of elements
 const configArrows = document.querySelectorAll(".sValue");
-const configMenus = [...document.querySelectorAll(".menu")].slice(1); // drop filter menu which also has the menu class
+const configMenus = [...document.querySelectorAll(".menu")].slice(2); // drop filter menus (landscape and portrait) which also has the menu class
 const configValues = Array(5).fill(0);
 const menuIsClicked = Array(5).fill(false);
 const configOptions = []; // list of lists of dom elements
@@ -596,7 +596,15 @@ function connect() {
     socket = new WebSocket(endpoint);
 
     socket.addEventListener("open", () => {
-        sendMessage("enter", { id: myId, username, score, deltaScore, theme });
+        sendMessage("enter", { 
+            id: myId, 
+            username, 
+            score, 
+            deltaScore, 
+            theme, 
+            seenQuestions1: JSON.parse(localStorage.getItem("rbw_seenQuestions1") ?? "[]"), 
+            seenQuestions2: JSON.parse(localStorage.getItem("rbw_seenQuestions2") ?? "[]") 
+        });
     });
 
     // while is not connected, keep trying to connect to server
@@ -618,11 +626,16 @@ function connect() {
         }
     });
     
-    // show loading page after 1 s if not connected
+    // show loading page and hide everything else after 1 s if not connected
     setTimeout(() => {
         if (socket.readyState !== WebSocket.OPEN) {
             document.getElementById("loading").style.display = "flex";
             document.getElementById("loading").style.display = "flex";
+
+            document.getElementById("home").style.display = "none";
+            document.getElementById("answering").style.display = "none";
+            document.getElementById("voting").style.display = "none";
+            document.getElementById("bank").style.display = "none";
         }
     }, 1000);
 }
@@ -807,9 +820,9 @@ callbacks.set("questions", ({ questions, letter, letterType, type }) => {
     document.getElementById("instructions").textContent = "Please enter words or phrases that " +
         (type == 0
         ? (letterType % 3 == 0
-        ? "contains but not start with"
+        ? "contain but not start with"
         : "start with")
-        : "contains")
+        : "contain")
         + " the letter \"" + letter + "\".";
 
     const parentDiv = document.getElementById("questions");
@@ -1024,7 +1037,7 @@ callbacks.set("tick", ({ timer }) => {
     }
 });
 
-callbacks.set("submit", ({}) => {
+callbacks.set("submit", ({ seenQuestions, type }) => {
     const submission = [];
     chosenAnswers.forEach(({ input, answer }, index) => {
         if (inputs[index].classList.contains("valid")) {
@@ -1034,6 +1047,7 @@ callbacks.set("submit", ({}) => {
     
     console.log(submission, chosenAnswers);
     sendMessage("submit", { id: myId, submission });
+    localStorage.setItem(`rbw_seenQuestions${type + 1}`, seenQuestions);
 });
 
 callbacks.set("vote", ({ submission, info }) => {
@@ -1422,6 +1436,17 @@ let currTab = Tab.NONE;
 // ui
 let tagDivs = []; // array of tags (element)
 let questionDivs = [[], []]; // array of questions (element) for both types
+
+// show/hide different layouts depending on whether portrait or landscape
+if (isPhone) {
+    document.querySelectorAll(".bankLandscape").forEach(div => {
+        div.style.display = "none";
+    });
+} else {
+    document.querySelectorAll(".bankPortrait").forEach(div => {
+        div.style.display = "none";
+    });
+}
 
 const searchDivs = document.querySelectorAll(".searchContent");
 searchDivs.forEach((searchDiv, i) => {

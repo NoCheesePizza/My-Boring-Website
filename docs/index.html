@@ -28,8 +28,8 @@
       </div>
       <div class="tabContainer">
         <div class="scrollRegion" id="tagsRegion" style="display: none;">
-          <div class="searchBar">
-            <div class="checkBox" onclick="clickTag(-1)">
+          <div class="searchBar bankLandscape">
+            <div class="checkBox" onclick="clickTag(-1)" style="align-self: center;">
               <i class="fa-solid fa-circle checkMark" id="tagOption"></i>
             </div>
             <div class="search">
@@ -37,11 +37,22 @@
               <i class="fa-solid fa-magnifying-glass"></i>
             </div>
           </div>
+          <div class="searchBar bankPortrait">
+            <div class="row">
+              <div class="checkBox" onclick="clickTag(-1)" style="align-self: center;">
+                <i class="fa-solid fa-circle checkMark" id="tagOption"></i>
+              </div>
+              <div class="search">
+                <div class="searchContent empty" contenteditable="true"></div>
+                <i class="fa-solid fa-magnifying-glass"></i>
+              </div>
+            </div>
+          </div>
           <div id="tags"></div>
         </div>
         <div class="scrollRegion" id="questions1Region" style="display: none;">
-          <div class="searchBar">
-            <div class="checkBox" onclick="clickQuestion(-1, 0)">
+          <div class="searchBar bankLandscape">
+            <div class="checkBox" onclick="clickQuestion(-1, 0)" style="align-self: center;">
               <i class="fa-solid fa-circle checkMark" id="question1Option"></i>
             </div>
             <div id="filter">
@@ -56,16 +67,45 @@
               <i class="fa-solid fa-magnifying-glass"></i>
             </div>
           </div>
+          <div class="searchBar bankPortrait">
+            <div class="search">
+              <div id="questions1Search" class="searchContent empty" contenteditable="true"></div>
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+            <div class="row">
+              <div class="checkBox" onclick="clickQuestion(-1, 0)" style="align-self: center;">
+                <i class="fa-solid fa-circle checkMark" id="question1Option"></i>
+              </div>
+              <div id="filter">
+                <i class="fa-solid fa-filter"></i></i>
+                <div class="filterTitle">Filter</div>
+                <div id="dropdown">▸</div>
+                <div class="menu" id="filterMenu" style="width: 101%">
+                </div>
+              </div>
+            </div>
+          </div>
           <div id="questions1"></div>
         </div>
         <div class="scrollRegion" id="questions2Region" style="display: none;">
-          <div class="searchBar">
-            <div class="checkBox" onclick="clickQuestion(-1, 1)">
+          <div class="searchBar bankLandscape">
+            <div class="checkBox" onclick="clickQuestion(-1, 1)" style="align-self: center;">
               <i class="fa-solid fa-circle checkMark" id="question2Option"></i>
             </div>
             <div class="search">
               <div class="searchContent empty" contenteditable="true"></div>
               <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+          </div>
+          <div class="searchBar bankPortrait">
+            <div class="row">
+              <div class="checkBox" onclick="clickQuestion(-1, 1)" style="align-self: center;">
+                <i class="fa-solid fa-circle checkMark" id="question2Option"></i>
+              </div>
+              <div class="search">
+                <div class="searchContent empty" contenteditable="true"></div>
+                <i class="fa-solid fa-magnifying-glass"></i>
+              </div>
             </div>
           </div>
           <div id="questions2"></div>

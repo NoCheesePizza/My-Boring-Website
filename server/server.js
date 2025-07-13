@@ -156,7 +156,6 @@ async function pullQuestions(type) {
                 questionRepo[1].push({ content: line.trim(), tagIndices: [] });
             }
         });
-        console.log(`q${type}Size: ${questionRepo[type].length}`);
         
         // add all questions to pool whenever syncing with google docs
         questionPool[type] = new Set(Array.from({ length: questionRepo[type].length }, (_, index) => index));
@@ -239,28 +238,26 @@ const players = new Map(); // id (string) to { username, score, deltaScore, isNe
 const sockets = new Map(); // id to ws
 let dcedPlayers = new Map(); // same as above
 const callbacks = new Map();
-
-// fixed data  (include "Backend/" if running via vs code)
-// const questions2 = fs.readFileSync("questions2.txt", "utf-8").split("\n").map(line => {
-//     const question = line.trim();
-//     const tags = [];
-//     return { question, tags };
-// });
 const points = [-2, -1, 0, 1, 2];
 
 // (start - QXYZ, contain - JKQXZ) -> <1% usage according to wikipedia (but can override if "any" not selected)
-const startsList = [];
-const containsList = [];
-const startsToExclude = [ "J", "K", "Q", "X", "Y", "Z" ];
-const containsToExclude = [ "J", "K", "Q", "X", "Y", "Z" ];
+const startList = [];
+const containList = [];
+const containNotStartList = [];
+const startToExclude = ["J", "K", "Q", "V", "X", "Y", "Z"];
+const containNotStartToExclude = ["B", "F", "J", "K", "Q", "V", "W", "X", "Y", "Z"];
+const containToExclude = ["J", "K", "Q", "V", "X", "Y", "Z"];
 
 for (let i = 65; i < 90; ++i) {
     const char = String.fromCharCode(i);
-    if (!startsToExclude.includes(char)) {
-        startsList.push(char);
+    if (!startToExclude.includes(char)) {
+        startList.push(char);
     }
-    if (!containsToExclude.includes(char)) {
-        containsList.push(char);
+    if (!containToExclude.includes(char)) {
+        containList.push(char);
+    }
+    if (!containNotStartToExclude.includes(char)) {
+        containNotStartList.push(char);
     }
 }
 
@@ -336,7 +333,9 @@ function countDown() {
                 });
             });
 
-            sendMessage("submit", {});
+            const type = config[Config.TYPE];
+            seenQuestions[type] = seenQuestions[type].union(questionIndices);
+            sendMessage("submit", { seenQuestions: JSON.stringify(Array.from(seenQuestions[type])), type });
 
         // send new time value and recurse
         } else {
@@ -417,7 +416,7 @@ function goNext() {
 }
 
 // new player joined
-callbacks.set("enter", ({ id, username, score, deltaScore, theme }) => {
+callbacks.set("enter", ({ id, username, score, deltaScore, theme, seenQuestions1, seenQuestions2 }) => {
     if (players.size == 0 && leaderId == "") {
         leaderId = id;
     }
@@ -431,6 +430,7 @@ callbacks.set("enter", ({ id, username, score, deltaScore, theme }) => {
         // stop looking for new leader if old leader reconnects
         if (setLeaderTimerId && id == leaderId) {
             clearTimeout(setLeaderTimerId);
+            setLeaderTimerId = null;
         }
         
         if (phase == Phase.VOTING) {
@@ -450,8 +450,11 @@ callbacks.set("enter", ({ id, username, score, deltaScore, theme }) => {
             }
         }
 
+    // first time player joins server
     } else {
         players.set(id, { username, score, deltaScore, isNew: true, theme });
+        seenQuestions[0] = seenQuestions[0].union(seenQuestions1);
+        seenQuestions[1] = seenQuestions[1].union(seenQuestions2);
     }
 
     // force everyone to redraw ui (leader might've been changed)
@@ -535,8 +538,6 @@ callbacks.set("transit", ({ to }) => {
                 wasPoolChanged[type] = false;            
             }
 
-            console.log(`seen count before: ${seenQuestions[type].size}`);
-
             // filter out seen questions (and reset seen questions if not enough questions)
             let currQuestions = questionPool[type].difference(seenQuestions[type]); // set
             if (currQuestions.size < config[Config.QUESTIONS] + 1) {
@@ -552,16 +553,14 @@ callbacks.set("transit", ({ to }) => {
                 questions = questionIndices.map(questionIndex => questionRepo[type][questionIndex].content);
             }
 
-            //todo remove
-            console.log(`seen count after: ${seenQuestions[type].size}`);
-            fs.writeFileSync("log.txt", [...questionPool[type]].map(index => questionRepo[type][index].content).join("\n"), "utf-8");
-
             // any letter (server decides)
             if (config[Config.LETTER] == 0) {
-                if (type == 1 || letterType % 3 == 0) {
-                    letter = containsList[Math.floor(Math.random() * containsList.length)];
+                if (type == 1) {
+                    letter = containList[Math.floor(Math.random() * containList.length)];
+                } else if (letterType % 3 == 0) {
+                    letter = containNotStartList[Math.floor(Math.random() * startList.length)];
                 } else {
-                    letter = startsList[Math.floor(Math.random() * startsList.length)];
+                    letter = startList[Math.floor(Math.random() * startList.length)];
                 }
 
             // specific letter (client decided)
@@ -600,9 +599,6 @@ callbacks.set("submit", ({ id, submission }) => {
     // go to next phase once everyone has submitted their answers
     if (++submissionCount >= players.size) {
         phase = Phase.VOTING;
-        seenQuestions[config[Config.TYPE]] = seenQuestions[config[Config.TYPE]].union(questionIndices);
-        console.log(`questions: ${questionIndices.length}`);
-        console.log(`seen: ${seenQuestions[config[Config.TYPE]].size}`);
 
         // initialise each player's options to tally if they dc (should be in the same order as submissions)
         players.forEach((value, key) => {
