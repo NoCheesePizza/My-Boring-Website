@@ -23,7 +23,7 @@
 
 //todo ------------ "global" ------------ //
 
-const isPhone = window.matchMedia("only screen and (max-width: 600px)").matches;
+const isPhone = window.matchMedia("only screen and (orientation: portrait)").matches;
 
 //todo ------------ answering ------------ //
 
@@ -102,19 +102,10 @@ function checkValidity(index) {
     let isValid = true;
 
     input = input.trim().toLowerCase(); // don't override player's input with lowercase chars
-    playerInput = playerInput.trim();
+    playerInput = playerInput.trim().toLowerCase();
 
     // skip checking empty word
     if (input.length == 0) {
-        
-        // set other red answers possibly back to green
-        // chosenAnswers[index].identicalIndices.forEach(value => {
-        //     chosenAnswers[value].identicalIndices.delete(index);
-        //     if (chosenAnswers[value].identicalIndices.size == 0) {
-        //         setValidity(true, inputs[value]);
-        //     }
-        // });
-        
         setUnanswered(element);
         chosenAnswers[index] = { input: "", answer: "", isValid: true /* , identicalIndices: new Set() */ };
         return;
@@ -152,44 +143,6 @@ function checkValidity(index) {
         }
     }
 
-    /*
-        const identicalIndices = chosenAnswers[index].identicalIndices;
-        chosenAnswers.forEach((otherAnswer, otherIndex) => {
-            if (otherAnswer.answer.length == 0 || index == otherIndex) {
-                return;
-            }
-
-            // not self and same answer
-            if (answer == otherAnswer.answer) {
-                setValidity(false, inputs[otherIndex]);
-                identicalIndices.add(otherIndex);
-                chosenAnswers[otherIndex].identicalIndices.add(index);
-
-            // different answer and used to be same
-            } else if (answer != otherAnswer.answer && identicalIndices.has(otherIndex)) {
-                identicalIndices.delete(otherIndex);
-                chosenAnswers[otherIndex].identicalIndices.delete(index);
-                
-                // don't immediately set validity to true as doing so invalidates the previous letter checks
-                if (chosenAnswers[otherIndex].identicalIndices.size == 0) {
-                    setValidity(checkValidity(otherIndex), inputs[otherIndex]);
-                }
-            }
-        });
-
-        if (identicalIndices.size != 0) {
-            isValid = false;
-        }
-
-        // normal for loop because forEach cannot break early
-        for (let i = 0; i < inputs.length; ++i) {
-            if (i != index && chosenAnswers[i].answer == playerAnswer) {
-                isValid = false;
-                break;
-            }
-        }
-    */
-
     setValidity(isValid, element);
     chosenAnswers[index] = { input: playerInput, answer: playerAnswer, isValid /* , identicalIndices */ };
 }
@@ -209,15 +162,6 @@ function checkForDuplicates() {
         }
     });
 }
-
-/*
-    function checkValidityForAll() {
-        inputs.forEach((_, index) => {
-            checkValidity(index);
-        });
-        checkForDuplicates();
-    }
-*/
 
 // next invalid or unanswered question, if any, to jump to when enter is pressed (tab will cycle between questions and arrow keys are self explanatory)
 function findNextIndex(currIndex) {
@@ -1281,10 +1225,16 @@ callbacks.set("bank", ({ _tagRepo, _questionRepo, _tickedQuestions, _crossedQues
     buildQuestionDivs(0);
     buildQuestionDivs(1);
 
-    // change icon for global check box
-    document.getElementById("tagOption").className = optionIcons[tagOption];
-    document.getElementById(`question1Option`).className = optionIcons[questionOptions[0]];
-    document.getElementById(`question2Option`).className = optionIcons[questionOptions[1]];
+    // change icons for global check box
+    document.querySelectorAll(".tagOption").forEach(element => {
+        element.className = optionIcons[tagOption] + " tagOption";
+    });
+    document.querySelectorAll(".question1Option").forEach(element => {
+        element.className = optionIcons[questionOptions[0]] + " question1Option";
+    });
+    document.querySelectorAll(".question2Option").forEach(element => {
+        element.className = optionIcons[questionOptions[1]] + " question2Option";
+    });
 
     // reload tab that player is on
     if (currTab == Tab.TAGS) {
@@ -1341,8 +1291,11 @@ callbacks.set("clickTag", ({ index, option }) => {
         }
     }
 
+    // change icon for global check box
     if (index == -1) {
-        document.getElementById("tagOption").className = optionIcons[option];
+        document.querySelectorAll(".tagOption").forEach(element => {
+            element.className = optionIcons[option] + " tagOption";
+        });
     }
 
     if (currTab == Tab.TAGS) {
@@ -1396,8 +1349,11 @@ callbacks.set("clickQuestion", ({ index, option, type }) => {
         }
     }
 
+    // change icon for global check box
     if (index == -1) {
-        document.getElementById(`question${type + 1}Option`).className = optionIcons[option];
+        document.querySelectorAll(`.question${type + 1}Option`).forEach(element => {
+            element.className = optionIcons[option] + ` question${type + 1}Option`;
+        });
     }
 
     if (currTab == Tab.TAGS) {

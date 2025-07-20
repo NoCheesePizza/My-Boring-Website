@@ -763,7 +763,9 @@ callbacks.set("clickQuestion", ({ index, type }) => {
                 break;
         }
 
-        questionOptions[type] = type == 0 ? (questionOptions[type] + 1) % 3 : (questionOptions[type] + 1) % 2;
+        console.log(`before: ${questionOptions[type]}`);
+        questionOptions[type] = type == 0 ? (questionOptions[type] + 1) % 3 : (questionOptions[type] == 1 ? 2 : 1);
+        console.log(`after: ${questionOptions[type]}`);
         sendMessage("clickQuestion", { index, option: questionOptions[type], type });
         return;
     }
