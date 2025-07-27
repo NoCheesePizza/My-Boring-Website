@@ -18,7 +18,7 @@
     [done] bug where capitalised words don't have similarity check
     [done] add phase checks to server
     [?] reconnecting to server does not refresh page
-    save seenQuestions in localStorage
+    [done] save seenQuestions in localStorage
 */
 
 //todo ------------ "global" ------------ //
@@ -1225,16 +1225,10 @@ callbacks.set("bank", ({ _tagRepo, _questionRepo, _tickedQuestions, _crossedQues
     buildQuestionDivs(0);
     buildQuestionDivs(1);
 
-    // change icons for global check box
-    document.querySelectorAll(".tagOption").forEach(element => {
-        element.className = optionIcons[tagOption] + " tagOption";
-    });
-    document.querySelectorAll(".question1Option").forEach(element => {
-        element.className = optionIcons[questionOptions[0]] + " question1Option";
-    });
-    document.querySelectorAll(".question2Option").forEach(element => {
-        element.className = optionIcons[questionOptions[1]] + " question2Option";
-    });
+    // change icon for global check box
+    document.getElementById("tagOption").className = optionIcons[tagOption];
+    document.getElementById(`question1Option`).className = optionIcons[questionOptions[0]];
+    document.getElementById(`question2Option`).className = optionIcons[questionOptions[1]];
 
     // reload tab that player is on
     if (currTab == Tab.TAGS) {
@@ -1291,11 +1285,8 @@ callbacks.set("clickTag", ({ index, option }) => {
         }
     }
 
-    // change icon for global check box
     if (index == -1) {
-        document.querySelectorAll(".tagOption").forEach(element => {
-            element.className = optionIcons[option] + " tagOption";
-        });
+        document.getElementById("tagOption").className = optionIcons[option];
     }
 
     if (currTab == Tab.TAGS) {
@@ -1349,11 +1340,8 @@ callbacks.set("clickQuestion", ({ index, option, type }) => {
         }
     }
 
-    // change icon for global check box
     if (index == -1) {
-        document.querySelectorAll(`.question${type + 1}Option`).forEach(element => {
-            element.className = optionIcons[option] + ` question${type + 1}Option`;
-        });
+        document.getElementById(`question${type + 1}Option`).className = optionIcons[option];
     }
 
     if (currTab == Tab.TAGS) {
@@ -1396,11 +1384,11 @@ let questionDivs = [[], []]; // array of questions (element) for both types
 // show/hide different layouts depending on whether portrait or landscape
 if (isPhone) {
     document.querySelectorAll(".bankLandscape").forEach(div => {
-        div.style.display = "none";
+        div.remove();
     });
 } else {
     document.querySelectorAll(".bankPortrait").forEach(div => {
-        div.style.display = "none";
+        div.remove();
     });
 }
 
@@ -1481,7 +1469,7 @@ filterDiv.addEventListener("click", event => {
 
     // close -> open
     if (isFilterOpen) {
-        openMenu(menuDiv, isPhone ? "120vw" : "30vw");
+        openMenu(menuDiv, isPhone ? "90vw" : "30vw");
         dropDownDiv.classList.add("open");
     
     // open -> close

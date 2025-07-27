@@ -824,7 +824,9 @@ wss.on("connection", ws => {
     // received message
     ws.on("message", message => {
         const msg = JSON.parse(message);
-        console.log(`received: ${msg.header}`);
+        if (msg.header != "tick" && msg.header != "vote") {
+            console.log(`received: ${msg.header}`);
+        }
 
         // first connection
         if (msg.header == "enter") {
